@@ -1,7 +1,7 @@
-use std::{env, fs, io};
+use std::{env, fs, io, path};
 
 const CONFIG_FILE: &str = "config.toml";
-const REALMLIST_FILENAME: &str = "realmlist.wtf";
+const REALMLIST_FILE: &str = "realmlist.wtf";
 
 /// Función encargada de leer el archivo de configuración
 fn read_config() -> Result<String, io::Error> {
@@ -137,20 +137,27 @@ pub fn save_server(content: &str, config: &toml::Table) -> Result<(), String> {
         None => return Err(std_err),
     };
     for path in paths {
-        if let Some(p) = path.as_str() {
-            let target = format!("{p}\\{REALMLIST_FILENAME}");
-            if let Err(err) = fs::write(&target, content) {
-                match err.kind() {
-                    io::ErrorKind::NotFound => {
-                        return Err(format!("el archivo `{target}` no existe"))
+        if let Some(target) = path.as_str() {
+            let dir = path::Path::new(target);
+
+            match dir.is_dir() {
+                true => {
+                    let file = dir.join(REALMLIST_FILE);
+                    if let Err(err) = fs::write(&file, content) {
+                        match err.kind() {
+                                    io::ErrorKind::NotFound => {
+                                        return Err(format!("ruta inválida: `{target}`"))
+                                    }
+                                    io::ErrorKind::PermissionDenied => {
+                                        return Err(format!(
+                                            "no tiene permisos suficientes para modificar el archivo `{}`", file.display()
+                                        ))
+                                    }
+                                    err => return Err(err.to_string()),
+                                }
                     }
-                    io::ErrorKind::PermissionDenied => {
-                        return Err(format!(
-                            "no tiene permisos suficientes para modificar el archivo `{target}`"
-                        ))
-                    }
-                    err => return Err(err.to_string()),
                 }
+                false => return Err(format!("ruta inválida: `{target}`")),
             }
         } else {
             return Err(std_err);
