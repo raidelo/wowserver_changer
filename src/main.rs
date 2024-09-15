@@ -38,7 +38,10 @@ fn main() {
         })
     );
 
-    if let Err(err) = save_server(&content, &config) {
-        eprintln!("error: {err}")
-    };
+    match save_server(&content, &config) {
+        Ok(val) => {
+            val.print_data();
+        }
+        Err(err) => eprintln!("error: {err}"),
+    }
 }
