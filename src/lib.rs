@@ -37,7 +37,7 @@ pub fn get_config() -> Result<toml::Table, String> {
 }
 
 /// Función encargada de verificar que archivo de configuración cumpla con el formato necesario
-pub fn verify_config(config: &toml::map::Map<String, toml::Value>) -> Result<(), String> {
+pub fn verify_config(config: &toml::Table) -> Result<(), String> {
     let mut missing_section: bool = false;
     let mut invalid_format: bool = true;
 
@@ -92,14 +92,21 @@ pub fn verify_config(config: &toml::map::Map<String, toml::Value>) -> Result<(),
     Ok(())
 }
 
+/// Función encargada de obtener el valor correspondiente a una clave en la tabla sin importar mayúsculas y minúsculas
+fn get_value<'a>(servers_section: &'a toml::Table, key: &str) -> Option<&'a toml::Value> {
+    for k in servers_section.keys() {
+        if k.to_lowercase() == key.to_lowercase() {
+            return Some(servers_section.get(k).unwrap());
+        }
+    }
+    None
+}
+
 /// Función encargada de intentar obtener el servidor del archivo de configuración a partir de su clave, o el mismo servidor en caso contrario si es que aparece en los valores
-pub fn get_server_from(
-    server: &str,
-    config: &toml::map::Map<String, toml::Value>,
-) -> Option<String> {
+pub fn get_server_from(server: &str, config: &toml::Table) -> Option<String> {
     if let Some(val) = config.get("SERVERS") {
         if let toml::Value::Table(tab) = val {
-            match tab.get(server) {
+            match get_value(tab, server) {
                 Some(val) => {
                     return Some(
                         val.as_str()
