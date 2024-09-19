@@ -213,3 +213,18 @@ pub fn save_server(content: &str, config: &toml::Table) -> Result<ModifiedFilesR
     }
     Ok(data)
 }
+
+
+/// Función encargada de preguntar al usuario por el servidor por la entrada estándar
+pub fn ask_user_on_stdin() -> Result<String, io::Error> {
+    use std::io::Write;
+
+    print!("Introduce el servidor: ");
+    io::stdout().flush()?;
+
+    let mut s = String::new();
+
+    io::stdin().read_line(&mut s)?;
+
+    Ok(s.trim().to_string())
+}
