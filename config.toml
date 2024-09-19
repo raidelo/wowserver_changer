@@ -1,0 +1,12 @@
+PATHS = [
+    "D:/PC/GRABAR/GAMES/WorldOfWarcraft/WOW (NEW)/Data/esMX/",
+    "D:/PC/GRABAR/GAMES/WorldOfWarcraft/WOW/Data/esMX/",
+    "C:/invalid route/blabla"
+    ]
+
+[SERVERS]
+sking = "sking.lerduzz.com"
+rogwow = "logon.rogwow.com"
+warmane = "logon.warmane.com"
+ultimowow = "logon.ultimowow.com"
+wowaura = "usa.wowaura.com:3200"
